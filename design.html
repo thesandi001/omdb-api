@@ -1,0 +1,416 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
+    <meta name="description" content="">
+    <meta name="author" content="">
+    <link rel="icon" href="images/favicon.ico">
+
+    <title>Dhoondh - The Ultimate Movie Search</title>
+
+    <!-- Bootstrap core CSS -->
+    <link href="css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- Custom styles for this template -->
+    <!--<link href="css/navbar-fixed-top.css" rel="stylesheet">-->            
+    <link href="css/custom.css" rel="stylesheet">
+
+    <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
+    <!--[if lt IE 9]>
+      <script src="https://oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js"></script>
+      <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+    <![endif]-->    
+    
+  </head>
+
+  <body>
+	<h1 id="logo" class="homeLogoInit">Dhoondh</h1>
+    <div class="container">
+
+        <div id="searchForm" class="formArea initMarginTop">
+        	
+        	<form name="searchFormName">
+                <input id="searchField" class="form-control input-lg" type="text" placeholder="Search IMDB for movies, tv series.." value="" autofocus><br/>              	<button id="searchButton1" type="button" class="btn btn-info">Search</button>
+                <button id="searchButton" type="button" class="btn btn-default">Make Me Lucky</button>
+            </form>
+        </div>               
+        
+		<br/>
+        
+        <div id="alert" class="alert alert-danger hidden" role="alert">Result not found</div>
+        
+        <div class="row">
+        	<div id="searchSet" class="col-xs-8 col-xs-offset-2 bgWhite hidden">
+            </div>
+        </div>
+        
+        <div id="resultSet" class="row hidden">
+        
+        	<div class="col-sm-3 center">
+                <div id="iPoster"></div>                
+            </div>
+            <div class="col-sm-5 bgWhite">                            
+                <div id="iTitle" class="title"></div>
+                <div id="iRated" class="caption"></div>                
+                <div class="borderBelow"></div>
+                
+                <div id="iimdbRating"></div>
+                <div id="iMetascore"></div>
+                <div class="borderBelow"></div>
+                
+                <div class="row">
+                	<div class="col-xs-12">
+                    	<strong>Freshness</strong>                 
+                        <div id="itomatoFresh"></div>
+                    </div>
+                </div>
+                                                
+                <div class="row">
+                	<div class="col-xs-6"><h4>Rotten Tomato</h4>
+                    	Tomatometer
+                        <div id="itomatoMeter"></div>
+                        <!--<div id="itomatoImage"></div>-->
+                        Average Rating
+                        <div id="itomatoRating"></div>                               
+                        <div id="itomatoReviews"></div>                                                                
+                    </div>
+                    <div class="col-xs-6"><h4>Audience</h4>
+                    	User Meter
+                    	<div id="itomatoUserMeter"></div>
+                        User Rating
+                        <div id="itomatoUserRating"></div>
+                        <div id="itomatoUserReviews"></div>                
+                    </div>
+                </div><br/>
+                
+                <div class="row">
+                	<div class="col-xs-12">
+                    	<div id="itomatoConsensus"></div>
+                    </div>
+                </div>
+                
+                <div class="borderBelow"></div>
+                
+                <div id="iPlot" class="justified"></div>
+                <div class="borderBelow"></div>
+                    
+                <div id="iDirector"></div>
+                <div id="iWriter"></div>
+                <div id="iActors"></div>
+                <div class="borderBelow"></div>
+                                
+                <div id="iLanguage"></div>
+                <div id="iCountry"></div>
+                <div id="iAwards"></div>
+                
+                <div id="iDVD"></div>
+                <div id="iBoxOffice"></div>
+                <div id="iProduction"></div>
+                <div id="iWebsite"></div>
+            </div>
+            <div class="col-sm-4 bgGrey">                                
+            	<h4>Similar Titles</h4>
+                <div id="rightNavResult"></div>
+            </div>
+        </div>
+
+    </div> <!-- /container -->
+
+    <!-- Bootstrap core JavaScript
+    ================================================== -->
+    <!-- Placed at the end of the document so the pages load faster -->
+    <script src="js/jquery-1.11.3.min.js"></script>
+    <script src="js/bootstrap.min.js"></script>
+    
+    <!-- Native JavaScript & jQuery
+    ================================================== -->
+    <!-- custom jQuery Script -->
+    <script>		
+    	$(function() {
+			
+			var currID;
+			
+			//$("#searchField").focus();						
+			
+			$("#searchButton").click(function clickSearchButton() {
+				
+				$("#alert").addClass("hidden");					
+				$("#searchSet").addClass("hidden");					
+				
+				var src = unescape($("#searchField").val());
+				$("#searchField").val(src);
+				if(src != "") {
+					
+					//search processing part
+					//var c = $('#search-by-title-form').serialize();
+					var c = 't=' + src + '&plot=full&tomatoes=true'; // search by title
+					var d = 'http://www.omdbapi.com/?' + c;
+					//var e = $('#search-by-title-request');
+					//e.find('a').attr('href', d).html(d);
+					var g = $('#dispJsonResponse');
+					$.ajax({
+						type: 'GET',
+						dataType: 'text',
+						url: 'http://www.omdbapi.com/?' + c,
+						statusCode: {
+							403: function () {
+								g.html('HTTP 403 Forbidden!')
+							}
+						},
+						success: function (a) {
+							
+							// bring the search area up using animation					
+								$("#searchForm").animate( {"margin-top" : "0" }, 1000, "swing");
+								$("#searchForm").removeClass("initMarginTop");
+								
+								$("#logo").animate( {"font-size" : "24px" }, 1000, "swing");
+								$("#logo").removeClass("homeLogoInit");
+								$("#logo").addClass("homeLogo");
+							
+							var jsonText = a.replace(/</g, '&lt;').replace(/>/g, '&gt;');							
+							
+							// generate JSON Clean Text
+							var jsObj = JSON.parse(jsonText);
+							
+							// actual output to html
+							
+							// check to see if result found
+							if (jsObj.Response == "True") {								
+								
+								$("#resultSet").removeClass("hidden");
+								// result found
+								//g.html(jsonText); // whole JSON								
+								
+								document.title = jsObj.Title + " (" + jsObj.Year + ") | Dhoondh";
+								currID = jsObj.imdbID;
+								
+								$("#iTitle").html( "<a href='http://www.imdb.com/title/" + jsObj.imdbID + "/' title='View in IMDB' target='_blank'>" + jsObj.Title + "</a> [" + jsObj.Year + "]" );
+								
+								$("#iRated").html( jsObj.Rated + "&nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp; " + jsObj.Released + "&nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp; " + jsObj.Runtime + "&nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp; " + jsObj.Genre + "&nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp; " + capitalizeFirstLetter(jsObj.Type));
+								
+								$("#iDirector").html( "<strong>Director : </strong>" + jsObj.Director + " [<a href='http://pro.imdb.com/title/" + jsObj.imdbID + "' target='_blank'>Contact Director</a>]");								
+								$("#iWriter").html( "<strong>Writer : </strong>" + jsObj.Writer);
+								$("#iActors").html( "<strong>Actors : </strong>" + jsObj.Actors + " [<a href='http://www.imdb.com/title/" + jsObj.imdbID + "/fullcredits' target='_blank'>See Full Cast &amp; Crew</a>]" );
+								$("#iPlot").html("<strong>Plot:</strong><br/>" + jsObj.Plot);
+								
+								$("#iLanguage").html( "<strong>Language : </strong>" + jsObj.Language);
+								$("#iCountry").html( "<strong>Country : </strong>" + jsObj.Country);
+								$("#iAwards").html( "<strong>Awards : </strong>" + jsObj.Awards);																
+	
+								$("#iimdbRating").html("");
+								for(var i=1; i<= Math.round(jsObj.imdbRating); i++) {
+									$("#iimdbRating").html( $("#iimdbRating").html() + "<span class='glyphicon glyphicon-star' aria-hidden='true'></span>");
+								}
+								for(var i=1; i<= 10-Math.round(jsObj.imdbRating); i++) {
+									$("#iimdbRating").html( $("#iimdbRating").html() + "<span class='glyphicon glyphicon-star-empty' aria-hidden='true'></span>");
+								}								
+								$("#iimdbRating").html( $("#iimdbRating").html() + "&nbsp;&nbsp;" + jsObj.imdbRating + "/10 from " + jsObj.imdbVotes + " users");
+								
+								$("#iMetascore").html("");
+								for(var i=1; i<= Math.round(jsObj.Metascore/10); i++) {
+									$("#iMetascore").html( $("#iMetascore").html() + "<span class='glyphicon glyphicon-star' aria-hidden='true'></span>");
+								}
+								for(var i=1; i<= 10-Math.round(jsObj.Metascore/10); i++) {
+									$("#iMetascore").html( $("#iMetascore").html() + "<span class='glyphicon glyphicon-star-empty' aria-hidden='true'></span>");
+								}				
+								if (jsObj.Metascore > 1 ) {				
+									$("#iMetascore").html( $("#iMetascore").html() + "&nbsp;&nbsp;" + jsObj.Metascore + "/100 Metascore");
+								}
+																																
+								$("#itomatoMeter").html( "<div class='progress'><div class='progress-bar' role='progressbar' style='width: "+ jsObj.tomatoMeter + "%;'>" + jsObj.tomatoMeter +"%</div></div>" );
+								//$("#itomatoImage").html( "<img class='img-responsive' src='" + jsObj.tomatoImage + "' />");
+								//$("#itomatoImage").html(jsObj.tomatoImage);
+								$("#itomatoRating").html( "<div class='progress'><div class='progress-bar' role='progressbar' style='width: "+ (jsObj.tomatoRating*10) + "%;'>" + jsObj.tomatoRating +" / 10</div></div>" );
+								$("#itomatoReviews").html( "Tomato Reviews: " + jsObj.tomatoReviews);
+								
+								//$("#itomatoFresh").html( "Fresh: " + jsObj.tomatoFresh);								
+								$("#itomatoFresh").html( "<div class='progress'><div class='progress-bar progress-bar-success' style='width: " + Math.round(((jsObj.tomatoFresh * 100) / jsObj.tomatoReviews )) + "%'><span class='sr-only'></span></div><div class='progress-bar progress-bar-danger' style='width: " + Math.round(((jsObj.tomatoRotten * 100) / jsObj.tomatoReviews )) + "%'><span class='sr-only'></span></div></div>" );
+								
+								//$("#itomatoRotten").html( "Rotten: " + jsObj.tomatoRotten);								
+								$("#itomatoConsensus").html( "<strong>Consensus: </strong>" + jsObj.tomatoConsensus);
+								
+								$("#itomatoUserMeter").html( "<div class='progress'><div class='progress-bar' role='progressbar' style='width: "+ jsObj.tomatoUserMeter + "%;'>" + jsObj.tomatoUserMeter +"%</div></div>" );
+								//$("#itomatoImage").html( "<img class='img-responsive' src='" + jsObj.tomatoImage + "' />");
+								//$("#itomatoImage").html(jsObj.tomatoImage);
+								$("#itomatoUserRating").html( "<div class='progress'><div class='progress-bar' role='progressbar' style='width: "+ (jsObj.tomatoUserRating*20) + "%;'>" + jsObj.tomatoUserRating +" / 5</div></div>" );
+								$("#itomatoUserReviews").html( "User Reviews: " + jsObj.tomatoUserReviews);
+								
+								//$("#itomatoUserMeter").html( "tomatoUserMeter : " + jsObj.tomatoUserMeter);
+								//$("#itomatoUserRating").html( "tomatoUserRating : " + jsObj.tomatoUserRating);
+								//$("#itomatoUserReviews").html( "tomatoUserReviews : " + jsObj.tomatoUserReviews);
+								
+								$("#iDVD").html( "<strong>DVD : </strong>" + jsObj.DVD);
+								$("#iBoxOffice").html( "<strong>BoxOffice : </strong>" + jsObj.BoxOffice);
+								$("#iProduction").html( "<strong>Production : </strong>" + jsObj.Production);
+								if(jsObj.Website != "N/A") {
+								$("#iWebsite").html( "<strong>Website : </strong><a href='" + jsObj.Website + "' target='_blank'>" + jsObj.Website + "</a>");													
+								}
+								else {
+									$("#iWebsite").html( "<strong>Website : </strong>" + jsObj.Website);
+								}									
+								
+								if (jsObj.Poster != "N/A") {
+									$("#iPoster").html( "<img class='img-responsive' src='" + jsObj.Poster + "' />");
+								}
+								else {
+									$("#iPoster").html( "<img class='img-responsive' src='images/blank-poster.jpg' />");
+								}
+							}
+							else {
+								$("#alert").removeClass("hidden");					
+								//alert("Result not found");
+							}
+						},
+						complete: function () {
+							//any action after parsing is complete
+							<!-- starts here -->
+							var c = 's=' + src; // search by term
+							var d = 'http://www.omdbapi.com/?' + c;
+							$.ajax({
+								type: 'GET',
+								dataType: 'text',
+								url: 'http://www.omdbapi.com/?' + c,
+								statusCode: {
+									403: function () {
+										$("#alert").html('HTTP 403 Forbidden!')
+									}
+								},
+								success: function (a) {
+									var jsonText = a.replace(/</g, '&lt;').replace(/>/g, '&gt;');		
+									var jsObj = JSON.parse(jsonText);
+									if (jsObj.Response != "False") {								
+										$("#rightNavResult").html("");
+										var j=1;
+										for(var i=0; i<jsObj.Search.length; i++) {
+											
+											if(currID != jsObj.Search[i].imdbID) { 
+												
+												$("#rightNavResult").html( $("#rightNavResult").html() + "<p>" + j++ + ". <a href='" + jsObj.Search[i].imdbID + "' title='" + escape(jsObj.Search[i].Title) + "' id='searchLink" + i + "' class='searchLink'>" + jsObj.Search[i].Title + "</a> [" + jsObj.Search[i].Year + "] [" + capitalizeFirstLetter(jsObj.Search[i].Type) + "]</p>");		
+											}
+										}
+									}
+								},
+								complete: function () {
+									//any action after parsing is complete
+									$("a[id*=searchLink]").each(function() {
+										//alert(1);
+										$(this).click(function() {
+											var id = $(this).attr("href");
+											var title = $(this).attr("title");
+											//alert(1);
+											$("#searchField").val(title);
+											$("#searchButton").click();
+											return false;				
+										});
+									});
+								}
+							});
+							<!-- ends here -->
+						}
+					})					
+				}
+			});
+			
+			$("#searchButton1").click(function () {
+				
+				$("#alert").addClass("hidden");					
+				$("#resultSet").addClass("hidden");					
+				
+				var src = $("#searchField").val();
+				
+				document.title = "Search " + src + " | Dhoondh";
+				
+				if(src != "") {
+					
+					//search processing part
+					//var c = $('#search-by-title-form').serialize();
+					var c = 's=' + src; // search by term
+					var d = 'http://www.omdbapi.com/?' + c;
+					//var e = $('#search-by-title-request');
+					//e.find('a').attr('href', d).html(d);
+					//var g = $('#dispJsonResponse');
+					$.ajax({
+						type: 'GET',
+						dataType: 'text',
+						url: 'http://www.omdbapi.com/?' + c,
+						statusCode: {
+							403: function () {
+								$("#alert").html('HTTP 403 Forbidden!')
+							}
+						},
+						success: function (a) {
+							var jsonText = a;
+							//var jsonText = a.replace(/</g, '&lt;').replace(/>/g, '&gt;');		
+							//var jsonText = "{Search : {Title: 'Hello1',imdbID: '2343245',Type: 'movie',Year: '2004' },Response: 'True'}";												
+							
+							// generate JSON Clean Text
+							var jsObj = JSON.parse(jsonText);
+							
+							// actual output to html
+							
+							// check to see if result found
+							if (jsObj.Response != "False") {								
+								
+								// bring the search area up using animation					
+								$("#searchForm").animate( {"margin-top" : "0" }, 1000, "swing");
+								$("#searchForm").removeClass("initMarginTop");
+								
+								$("#logo").animate( {"font-size" : "24px" }, 1000, "swing");
+								$("#logo").removeClass("homeLogoInit");
+								$("#logo").addClass("homeLogo");	
+								
+								$("#searchSet").removeClass("hidden");																		
+													
+								// result found
+								//g.html(jsonText); // whole JSON
+								
+								$("#searchSet").html("");
+								for(var i=0; i<jsObj.Search.length; i++) {
+									
+									$("#searchSet").html( $("#searchSet").html() + "<h4>" + (i+1) + ". <a href='" + jsObj.Search[i].imdbID + "' title='" + escape(jsObj.Search[i].Title) + "' id='searchLink" + i + "' class='searchLink'>" + jsObj.Search[i].Title + "</a> [" + jsObj.Search[i].Year + "] [" + capitalizeFirstLetter(jsObj.Search[i].Type) + "]</h4>");																		
+																											
+								}				
+								$("#searchSet").html( $("#searchSet").html() + "<p align='right' class='caption'>(max search result limit = 10)</p>");												
+							}
+							else {			
+								$("#alert").removeClass("hidden");					
+								//alert("Result not found");
+							}
+						},
+						complete: function () {
+							//any action after parsing is complete
+							$("a[id*=searchLink]").each(function() {
+								//alert(1);
+								$(this).click(function() {
+									var id = $(this).attr("href");
+									var title = $(this).attr("title");
+									//alert(1);
+									$("#searchField").val(title);
+									$("#searchButton").click();
+									return false;				
+								});
+							});
+						}
+					})					
+				}
+			});
+				
+		});
+		
+		$("form").submit( function () {
+			$("#searchButton1").click();
+			$("#searchField").blur();
+			return false;
+		});
+		
+		function capitalizeFirstLetter(string) {
+			return string.charAt(0).toUpperCase() + string.slice(1);
+		}
+		
+    </script>
+    
+  </body>
+</html>

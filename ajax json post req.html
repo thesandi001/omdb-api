@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+
+<script src="https://code.jquery.com/jquery-1.9.1.js" type='text/javascript'>
+
+/* Adding a handler to the submit event */
+
+$("#form1").submit(function(event) {
+
+/*Stop the usual form submission event*/
+
+event.preventDefault();
+
+/* get the elements required for the post method*/
+
+var $form = $( this ),
+
+url = $form.attr( 'action' );
+
+/* post method */
+
+var posting = $.post( url, { name: $('#name').val()}, function( data ) {
+
+alert('success');
+
+});
+
+});
+
+</script>
+
+</head>
+
+<body>
+
+<form id="form1" action="getPostData.php" title="" method="post">
+
+<div>
+
+<label class="title">Enter your Name</label>
+
+<input type="text" id="name" name="name" >
+
+</div>
+
+<div>
+
+<input type="submit" id="submitButton"  name="submitButton" value="Submit">
+
+</div>
+
+</form>
+
+</body>
+
+</html>
